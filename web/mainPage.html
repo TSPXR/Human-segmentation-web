@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test page</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="google" content="notranslate">
+    <meta name="theme-color" content="#4383FA">
+
+    <link rel="stylesheet" type="text/css" href="./styles/index.css"/>
+
+    <!--
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "./modules/three.js/three.module.js"
+          }
+        }
+    </script>
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.19.0/dist/tf.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script type="module" src="./modules/main.js"></script>
+</head>
+<body>
+    <div id="loading">
+        <!-- <img src="./assets/logo.png" /> -->
+        <!-- <span class="loading-text">TSPXR x WSCE2022 AR Event</span> -->
+        <video id="video" muted playsinline autoplay></video>
+        <canvas id="render_area" width="2560" height="1440"></canvas>
+        <canvas id="render_mask" width="2560" height="1440" hidden></canvas>
+        <canvas id="bg_area" hidden></canvas>
+        <!-- <img id="preview-frame" src="./assets/img/preview_frame.png" width="2560" height="1440"> -->
+        <!-- <canvas id="send_canvas" hidden></canvas> -->
+    </div>
+
+</body>
+</html>
