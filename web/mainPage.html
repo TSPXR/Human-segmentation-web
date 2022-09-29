@@ -33,7 +33,12 @@
         <video id="video" muted playsinline autoplay></video>
         <canvas id="render_area" width="2560" height="1440"></canvas>
         <canvas id="render_mask" width="2560" height="1440" hidden></canvas>
-        <canvas id="bg_area" hidden></canvas>
+        <canvas id="buffer" hidden></canvas>
+        <svg width=0 height=0 style=visibility:hidden;position:absolute>
+          <filter id=lumToAlpha>
+            <feColorMatrix type="luminanceToAlpha" />
+          </filter>
+        </svg>
         <!-- <img id="preview-frame" src="./assets/img/preview_frame.png" width="2560" height="1440"> -->
         <!-- <canvas id="send_canvas" hidden></canvas> -->
     </div>

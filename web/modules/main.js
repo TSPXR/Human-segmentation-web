@@ -1,5 +1,5 @@
 import * as camera_util from "./camera.js";
-import {drawMask} from "./drawMask.js";
+import {convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlendedImageWithBlackNWhite} from "./drawMask.js";
 
 
 /*
@@ -27,19 +27,13 @@ canvas.height = 720; // VideoElement height
 let context = canvas.getContext('2d');
 context.width = 1280;
 context.height = 720;
-context.fillStyle = '#ffffff'; // implicit alpha of 1
-context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+// context.fillStyle = '#ffffff'; // implicit alpha of 1
+// context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-
-const backgroundMask = document.getElementById('bg_area');
-var bgContext = backgroundMask.getContext('2d');
-let testImage = new Image;
-testImage.onload = function(){
-    bgContext.drawImage(testImage,0,0); // Or at whatever offset you like
-};
-testImage.src = "http://tigerday.org/wp-content/uploads/2013/04/Siberischer_tiger.jpg";
-
-console.log(testImage)
+const buffer = document.getElementById('buffer');
+buffer.width = 1280;
+buffer.height = 720;
+const bufferCtx = buffer.getContext( '2d', { willReadFrequently: true } );
 
 const maskCanvas = document.getElementById("render_mask");
 let maskContext = maskCanvas.getContext('2d');
@@ -72,18 +66,30 @@ async function render_video(){
 
     // console.log(output);
     
-    // const resizedOutput = tf.image.resizeBilinear(output, [1280, 720]).squeeze(0).mul(255).cast('int32');
-    const resizedOutput = tf.image.resizeBilinear(output, [720, 1280]).squeeze(0).cast('float32');
+    const resizedOutput = tf.image.resizeBilinear(output, [1280, 720]).squeeze(0).mul(255).cast('int32');
+    // const resizedOutput = tf.image.resizeBilinear(output, [720, 1280]).squeeze(0).cast('float32');
 
     tf.browser.toPixels(resizedOutput, maskCanvas);
     
     
+    var w = 1280;
+    var h = 720;
+
+    context.clearRect(0, 0, w, h);
+    context.filter = "url(#lumToAlpha)";
+    context.drawImage( maskCanvas, 0, 0, w, h );
+    context.filter = "none";
+    context.globalCompositeOperation = 'source-in';
+    context.drawImage( videoElement, 0, 0, w, h );
     context.globalCompositeOperation = 'source-over';
-    context.drawImage(maskCanvas, 0, 0);
+
     
-    
-    context.globalCompositeOperation = 'multiply'; // multiply , source-in
-    context.drawImage(videoElement, 0 , 0);
+
+    // 첫번째 방법
+    // context.globalCompositeOperation = 'source-over';
+    // context.drawImage(maskCanvas, 0, 0);
+    // context.globalCompositeOperation = 'multiply'; // multiply , source-in
+    // context.drawImage(videoElement, 0 , 0);
 
     
     

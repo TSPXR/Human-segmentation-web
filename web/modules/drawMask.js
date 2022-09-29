@@ -1,46 +1,70 @@
+function convertCanvasToGrayscale(canvas){
+    var tmp = document.createElement('canvas');
+    tmp.width = canvas.width;
+    tmp.height = canvas.height;
+    var tmpctx = tmp.getContext('2d');
 
-function renderImageDataToCanvas(image, canvas) {
+    // conversion
+    tmpctx.globalCompositeOperation="source-over";  // default composite value
+    tmpctx.fillStyle="#FFFFFF";
+    tmpctx.fillRect(0,0,canvas.width,canvas.height);
+    tmpctx.globalCompositeOperation="luminosity";
+    tmpctx.drawImage(canvas,0,0);
 
-  }
-
-function renderImageDataToOffScreenCanvas(image, canvas) {
-    renderImageDataToCanvas(image, canvas);
-
-    return canvas;
+    // write converted back to canvas
+    var ctx = canvas.getContext('2d');
+    ctx.globalCompositeOperation="source-over";
+    ctx.drawImage(tmp, 0, 0);
 }
 
-function drawMask(context, videoElement, maskImage) {
-    
-    // canvas.width = 1280;
-    // canvas.height = 720;
+function convertGrayscaleCanvasToBlackNWhite(canvas){
+    var ctx = canvas.getContext('2d');
 
-    // const ctx = canvas.getContext('2d');
-    const ctx = context;
+    // in case the grayscale conversion is to bulky for ya
+    // darken the canvas bevore further black'nwhite conversion
+    //for(var i=0;i<3;i++){
+    //    ctx.globalCompositeOperation = 'multiply';
+    //    ctx.drawImage(canvas, 0, 0);
+    //}
 
-    ctx.save();
-    // if (flipHorizontal) {
-    //     flipCanvasHorizontal(canvas);
-    // }
-
-    ctx.drawImage(videoElement, 0, 0);
-
-    ctx.globalAlpha = 1.0;
-    if (maskImage) {
-
-        // canvas.width = videoElement.width;
-        // canvas.height = videoElement.height;
-        // const ctx = canvas.getContext('2d');
-        const ctx = context;
-      
-        ctx.putImageData(videoElement, 0, 0);
-
-        
-        // TODO
-        // const blurredMask = drawAndBlurImageOnOffScreenCanvas(
-        //     mask, maskBlurAmount, CANVAS_NAMES.blurredMask);
-        ctx.drawImage(maskImage, 0, 0, width, height);
-    }
-    ctx.restore();
+    ctx.globalCompositeOperation = 'color-dodge';
+    ctx.fillStyle = "rgba(253, 253, 253, 1)";
+    ctx.beginPath();
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'color-dodge';
+    ctx.fillStyle = "rgba(253, 253, 253, 1)";
+    ctx.beginPath();
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fill();
 }
 
-export {drawMask}
+function getBlendedImageWithBlackNWhite(canvasimage, canvasbw){
+    var tmp = document.createElement('canvas');
+    tmp.width = canvasimage.width;
+    tmp.height = canvasimage.height;
+
+    var tmpctx = tmp.getContext('2d');
+
+    tmpctx.globalCompositeOperation = 'source-over';
+    tmpctx.drawImage(canvasimage, 0, 0);
+
+    // multiply means, that every white pixel gets replaced by canvasimage pixel
+    // and every black pixel will be left black
+    tmpctx.globalCompositeOperation = 'multiply';
+    tmpctx.drawImage(canvasbw, 0, 0);
+
+    return tmp;
+}
+
+function invertCanvas(canvas){
+    var ctx = canvas.getContext("2d");
+
+    ctx.globalCompositeOperation = 'difference';
+    ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    ctx.beginPath();
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fill();
+}
+
+export { convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlendedImageWithBlackNWhite}
