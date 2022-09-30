@@ -4,8 +4,8 @@ var cors = require('cors');
 
 let fs = require('fs');
 let options = {
-    key: fs.readFileSync('./web/self_key.pem'),
-    cert: fs.readFileSync('./web/self_cert.pem'),
+    key: fs.readFileSync('./ssl/park-tdl.tspxr.ml-key.pem'),
+    cert: fs.readFileSync('./ssl/park-tdl.tspxr.ml-crt.pem'),
     requestCert: false,
     rejectUnauthorized: false
 };
@@ -20,7 +20,7 @@ app.use('/styles', express.static(__dirname + '/styles'));
 app.use('/modules', express.static(__dirname + '/modules'));
 // app.use('/build', express.static('/home/park/park/Realtime-Face-Mesh/node_modules/three/build'));
 // app.use('/gltf', express.static('/home/park/park/Realtime-Face-Mesh/node_modules/three/'));
-var server_port = 5556;
+var server_port = 5555;
 var server = require('https').createServer(options, app);
 
 
