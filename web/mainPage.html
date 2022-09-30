@@ -26,11 +26,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script type="module" src="./modules/main.js"></script>
 </head>
+
 <body>
     <div id="loading">
-        <!-- <img src="./assets/logo.png" /> -->
-        <!-- <span class="loading-text">TSPXR x WSCE2022 AR Event</span> -->
+        <img src="./assets/logo.png" />
+        <span class="loading-text">Test segmentation</span>
         <video id="video" muted playsinline autoplay></video>
+        
+        <video id="backgroundVideo" muted playsinline autoplay width="2560" height="1440"></video>
+        
         <canvas id="render_area" width="2560" height="1440"></canvas>
         <canvas id="render_mask" width="2560" height="1440" hidden></canvas>
         <canvas id="buffer" hidden></canvas>
@@ -39,8 +43,7 @@
             <feColorMatrix type="luminanceToAlpha" />
           </filter>
         </svg>
-        <!-- <img id="preview-frame" src="./assets/img/preview_frame.png" width="2560" height="1440"> -->
-        <!-- <canvas id="send_canvas" hidden></canvas> -->
+        
     </div>
 
 </body>

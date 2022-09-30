@@ -1,5 +1,6 @@
 import * as camera_util from "./camera.js";
-import {convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlendedImageWithBlackNWhite} from "./drawMask.js";
+// import {flipCanvasHorizontal} from "./drawMask.js";
+import * as backgroundPlayer from './backgroundAr.js';
 
 
 /*
@@ -11,6 +12,8 @@ import {convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlende
 */
 
 
+let width = 1280;
+let height = 720;
 
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
@@ -21,34 +24,36 @@ console.log(tf.getBackend()); // tf backend 확인
 const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
 
 const canvas = document.getElementById("render_area");
-canvas.width = 1280; // VideoElement width
-canvas.height = 720; // VideoElement height
+canvas.width = width; // VideoElement width
+canvas.height = height; // VideoElement height
 
 let context = canvas.getContext('2d');
-context.width = 1280;
-context.height = 720;
+context.width = width;
+context.height = height;
 // context.fillStyle = '#ffffff'; // implicit alpha of 1
 // context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
 const buffer = document.getElementById('buffer');
-buffer.width = 1280;
-buffer.height = 720;
+buffer.width = width;
+buffer.height = height;
 const bufferCtx = buffer.getContext( '2d', { willReadFrequently: true } );
 
 const maskCanvas = document.getElementById("render_mask");
 let maskContext = maskCanvas.getContext('2d');
 
 // const videoElement = document.querySelector('video');
-let videoElement = document.getElementById('video');
+const videoElement = document.getElementById('video');
+// camera_util.getCamera(videoElement);
+console.log(videoElement)
+
 
 videoElement.addEventListener('canplaythrough', render_video);
-console.log(videoElement.videoWidth, videoElement.videoHeight);
-videoElement.width = 1280;
-videoElement.height = 720;
+// console.log(videoElement.videoWidth, videoElement.videoHeight);
+// videoElement.width = width;
+// videoElement.height = height;
 
 
-// Initialize
-camera_util.getCamera(videoElement);
+
 
 
 async function render_video(){
@@ -66,22 +71,20 @@ async function render_video(){
 
     // console.log(output);
     
-    const resizedOutput = tf.image.resizeBilinear(output, [1280, 720]).squeeze(0).mul(255).cast('int32');
+    const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
     // const resizedOutput = tf.image.resizeBilinear(output, [720, 1280]).squeeze(0).cast('float32');
 
     tf.browser.toPixels(resizedOutput, maskCanvas);
     
     
-    var w = 1280;
-    var h = 720;
-
-    context.clearRect(0, 0, w, h);
+    context.clearRect(0, 0, width, height);
     context.filter = "url(#lumToAlpha)";
-    context.drawImage( maskCanvas, 0, 0, w, h );
+    context.drawImage( maskCanvas, 0, 0, width, height );
     context.filter = "none";
     context.globalCompositeOperation = 'source-in';
-    context.drawImage( videoElement, 0, 0, w, h );
+    context.drawImage( videoElement, 0, 0, width, height);
     context.globalCompositeOperation = 'source-over';
+    
 
     
 
@@ -110,4 +113,14 @@ async function render_video(){
     await requestAnimationFrame(render_video);
     
     
+}
+
+window.onload = camera_util.getCamera(videoElement);
+
+// 페이지를 로드하면 실행 (구성요소들 초기화)
+window.onload = () => {
+    console.log('on load')
+    // canvas.width = width;
+    // canvas.height = height;
+    camera_util.getCamera(videoElement);
 }

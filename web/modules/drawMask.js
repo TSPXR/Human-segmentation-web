@@ -1,3 +1,9 @@
+function flipCanvasHorizontal(canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.scale(-1, 1);
+    ctx.translate(-canvas.width, 0);
+  }
+
 function convertCanvasToGrayscale(canvas){
     var tmp = document.createElement('canvas');
     tmp.width = canvas.width;
@@ -67,4 +73,5 @@ function invertCanvas(canvas){
     ctx.fill();
 }
 
-export { convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlendedImageWithBlackNWhite}
+
+export { convertCanvasToGrayscale, convertGrayscaleCanvasToBlackNWhite, getBlendedImageWithBlackNWhite, flipCanvasHorizontal}
