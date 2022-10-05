@@ -47,7 +47,9 @@ backgroundVideo.autoplay = true;
 backgroundVideo.loop = true;
 backgroundVideo.mute = true;
 backgroundVideo.setAttribute('crossorigin', 'annonymous');
-backgroundVideo.src = backgroundVideoPath + 'tspxr-bg-2.mp4';
+// backgroundVideo.src = backgroundVideoPath + 'tspxr-bg-2.mp4';
+backgroundVideo.src = backgroundVideoPath + '01_test.mp4';
+
 backgroundVideo.addEventListener('canplaythrough', render_ar_video);
 
 let videoGeometry = new THREE.PlaneBufferGeometry(1.7, 1);
