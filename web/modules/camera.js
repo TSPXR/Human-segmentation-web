@@ -85,10 +85,10 @@
  function openCamera(baseVideo, deviceId) {
      return new Promise((reserve, reject) => {
          let video = {
-        //   minWidth: 1280,
-        //   minHeight: 720,
-        //   width: 1280,
-        //   height: 720
+          minWidth: 3840,
+          minHeight: 2160,
+          width: 3840,
+          height: 2160,
  
         //  minWidth: 2560,
         //  minHeight: 1440,

@@ -89,6 +89,7 @@ html, body {
 	width: 100% !important;
 	height: 100% !important;
 	object-fit: cover;
+	/* transform: rotate(90deg); */
 	/* -webkit-transform: scaleX(-1); */
 	/* transform: scaleX(-1); */
 }
