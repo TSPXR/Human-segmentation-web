@@ -32,13 +32,18 @@
         <img src="./assets/logo.png" />
         <span class="loading-text">Test segmentation</span>
         <!-- <video id="video" width="2560" height="1440"></video> -->
+        
         <video id="video" muted playsinline autoplay></video>
         
-        <video id="backgroundVideo" muted playsinline autoplay width="2560" height="1440"></video>
         
+
+        <video id="backgroundVideo" muted playsinline autoplay width="1440" height="2560"></video> -->
+        
+        <canvas id="render_background" width="2560" height="1440"></canvas>
         <canvas id="render_area" width="2560" height="1440"></canvas>
         <canvas id="render_mask" width="2560" height="1440" hidden></canvas>
         <canvas id="buffer" hidden></canvas>
+
         <svg width=0 height=0 style=visibility:hidden;position:absolute>
           <filter id=lumToAlpha>
             <feColorMatrix type="luminanceToAlpha" />

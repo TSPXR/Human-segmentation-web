@@ -2,7 +2,6 @@ import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
 import * as backgroundPlayer from './backgroundAr.js';
 
-
 /*
     Canvas mask 
     https://stackoverflow.com/questions/24740899/merge-canvas-image-and-canvas-alpha-mask-into-dataurl-generated-png
@@ -11,9 +10,14 @@ import * as backgroundPlayer from './backgroundAr.js';
     https://github.com/tensorflow/tfjs-models/blob/b5d49c0f5ba2057cc29b40317126c5f182495f96/body-pix/src/output_rendering_util.ts
 */
 
+/*
+    ----------------------<<< Global variable >>>----------------------
+*/
 
-let width = 1280;
-let height = 720;
+// VideoElemet의 너비
+let width = 1440;
+// VideoElement의 높이
+let height = 2560;
 
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
@@ -48,11 +52,11 @@ console.log(videoElement)
 
 
 videoElement.addEventListener('canplaythrough', render_video);
-// console.log(videoElement.videoWidth, videoElement.videoHeight);
-// videoElement.width = width;
-// videoElement.height = height;
 
-
+const backgroundCanvas = document.getElementById('render_background');
+let backgroundCanvasContext = backgroundCanvas.getContext('2d');
+backgroundCanvasContext.fillStyle = '#3B0B24';
+backgroundCanvasContext.fillRect(0, 0, 2560, 1440);
 
 
 
@@ -60,7 +64,7 @@ async function render_video(){
     tf.engine().startScope()
     
     let date1 = new Date();
-    
+
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
     
     const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
@@ -76,7 +80,6 @@ async function render_video(){
 
     tf.browser.toPixels(resizedOutput, maskCanvas);
     
-    
     context.clearRect(0, 0, width, height);
     context.filter = "url(#lumToAlpha)";
     context.drawImage( maskCanvas, 0, 0, width, height );
@@ -85,24 +88,11 @@ async function render_video(){
     context.drawImage( videoElement, 0, 0, width, height);
     context.globalCompositeOperation = 'source-over';
     
-
-    
-
-    // 첫번째 방법
-    // context.globalCompositeOperation = 'source-over';
-    // context.drawImage(maskCanvas, 0, 0);
-    // context.globalCompositeOperation = 'multiply'; // multiply , source-in
-    // context.drawImage(videoElement, 0 , 0);
-
-    
-    
-
-    // let invertMask = tf.where(resizedOutput>0, 0, 1);
-    // console.log(invertMask)
-     
     tf.dispose(inputImageTensor);
     tf.dispose(resizedImage);
+    tf.dispose(normalizedImage);
     tf.dispose(output);
+    tf.dispose(resizedOutput);
 
     var date2 = new Date();
     var diff = date2 - date1;
