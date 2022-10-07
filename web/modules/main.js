@@ -1,7 +1,7 @@
 import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
 import * as backgroundPlayer from './backgroundAr.js';
-
+import * as tensorOps from './tensorOps.js'
 /*
     Canvas mask 
     https://stackoverflow.com/questions/24740899/merge-canvas-image-and-canvas-alpha-mask-into-dataurl-generated-png
@@ -37,10 +37,10 @@ context.height = height;
 // context.fillStyle = '#ffffff'; // implicit alpha of 1
 // context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
-const buffer = document.getElementById('buffer');
-buffer.width = width;
-buffer.height = height;
-const bufferCtx = buffer.getContext( '2d', { willReadFrequently: true } );
+// const buffer = document.getElementById('buffer');
+// buffer.width = width;
+// buffer.height = height;
+// const bufferCtx = buffer.getContext( '2d', { willReadFrequently: true } );
 
 const maskCanvas = document.getElementById("render_mask");
 let maskContext = maskCanvas.getContext('2d');
@@ -62,24 +62,15 @@ backgroundCanvasContext.fillRect(0, 0, 2560, 1440);
 
 async function render_video(){
     tf.engine().startScope()
-    
     let date1 = new Date();
 
-    const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
-    
-    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
-    const normalizedImage = tf.div(resizedImage, 255);
-    
-    // const output = await model.executeAsync(resizedImage);
+    /* tensorflow segmentation 연산 부분*/
+    const normalizedImage = tensorOps.preprocess(videoElement);
     const output = await model.execute(normalizedImage).expandDims(3);
-
-    // console.log(output);
-    
     const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
-    // const resizedOutput = tf.image.resizeBilinear(output, [720, 1280]).squeeze(0).cast('float32');
 
+    /* 합성하는 부분 */
     tf.browser.toPixels(resizedOutput, maskCanvas);
-    
     context.clearRect(0, 0, width, height);
     context.filter = "url(#lumToAlpha)";
     context.drawImage( maskCanvas, 0, 0, width, height );
@@ -88,8 +79,7 @@ async function render_video(){
     context.drawImage( videoElement, 0, 0, width, height);
     context.globalCompositeOperation = 'source-over';
     
-    tf.dispose(inputImageTensor);
-    tf.dispose(resizedImage);
+    
     tf.dispose(normalizedImage);
     tf.dispose(output);
     tf.dispose(resizedOutput);

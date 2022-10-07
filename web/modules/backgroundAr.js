@@ -16,8 +16,8 @@ import { GLTFLoader } from './three.js/loaders/GLTFLoader.js';
 */
 
 // Set global variable
-let camera_width = 1280; // 렌더링할 캔버스 너비
-let camera_height = 720; // 렌더링할 캔버스 높이
+let camera_width = 1440; // 렌더링할 캔버스 너비
+let camera_height = 2560; // 렌더링할 캔버스 높이
 
 // Set Scene and PerspectiveCamera
 let scene = new THREE.Scene();
@@ -40,17 +40,26 @@ window.addEventListener('resize', onWindowResize, false);
 // Background video path
 const backgroundVideoPath = 'assets/background_videos/';
 const backgroundVideo = document.getElementById('backgroundVideo');
-// const backgroundVideo = document.createElement('video');
 backgroundVideo.width = camera_width;
 backgroundVideo.height = camera_height;
 backgroundVideo.autoplay = true;
 backgroundVideo.loop = true;
 backgroundVideo.mute = true;
 backgroundVideo.setAttribute('crossorigin', 'annonymous');
-// backgroundVideo.src = backgroundVideoPath + 'tspxr-bg-2.mp4';
-backgroundVideo.src = backgroundVideoPath + '01_test.webm';
+backgroundVideo.src = backgroundVideoPath + 'seungeun_bg.webm';
 
-backgroundVideo.addEventListener('canplaythrough', render_ar_video);
+
+// Front video setting
+const frontVideoPath = 'assets/front_videos/'
+const frontVideo = document.getElementById('frontVideo');
+frontVideo.width = camera_width;
+frontVideo.height = camera_height;
+frontVideo.autoplay = true;
+frontVideo.loop = true;
+frontVideo.mute = true;
+frontVideo.setAttribute('crossorigin', 'annonymous');
+frontVideo.src = frontVideoPath + 'front.webm';
+// backgroundVideo.addEventListener('canplaythrough', render_ar_video);
 
 let videoGeometry = new THREE.PlaneBufferGeometry(1.7, 1);
 
@@ -85,7 +94,7 @@ function onWindowResize() {
   
 
 async function render_ar_video() {
-    // console.log('render')
+    console.log('render')
     camera.updateProjectionMatrix();
   camera.position.z = 0.5;
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -96,4 +105,4 @@ async function render_ar_video() {
     // setTimeout(render_ar_video, 1)
 }
 
-render_ar_video()
+// render_ar_video()
