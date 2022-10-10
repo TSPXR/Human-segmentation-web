@@ -77,11 +77,11 @@ backgroundVideo.onplay = function() {
 }
 
 
-let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+// let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 
 // Set Three.js Perspective camera and Renderer
 
-scene.add(videoMesh);
+// scene.add(videoMesh);
 
 
 function onWindowResize() {

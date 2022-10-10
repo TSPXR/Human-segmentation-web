@@ -1,0 +1,25 @@
+const camera_width = 1440;
+const camera_height = 2560;
+
+// Background video path
+const backgroundVideoPath = 'assets/background_videos/';
+const backgroundVideo = document.getElementById('backgroundVideo');
+backgroundVideo.width = camera_width;
+backgroundVideo.height = camera_height;
+backgroundVideo.autoplay = true;
+backgroundVideo.loop = true;
+backgroundVideo.mute = true;
+backgroundVideo.setAttribute('crossorigin', 'annonymous');
+backgroundVideo.src = backgroundVideoPath + 'seungeun_bg.webm';
+
+
+// Front video setting
+const frontVideoPath = 'assets/front_videos/'
+const frontVideo = document.getElementById('frontVideo');
+frontVideo.width = camera_width;
+frontVideo.height = camera_height;
+frontVideo.autoplay = true;
+frontVideo.loop = true;
+frontVideo.mute = true;
+frontVideo.setAttribute('crossorigin', 'annonymous');
+frontVideo.src = frontVideoPath + 'front.webm';
