@@ -85,15 +85,15 @@
  function openCamera(baseVideo, deviceId) {
      return new Promise((reserve, reject) => {
          let video = {
-        //   minWidth: 1280,
-        //   minHeight: 720,
-        //   width: 1280,
-        //   height: 720
+          minWidth: 1440,
+          minHeight: 2560,
+          width: 1440,
+          height: 2560,
  
-         minWidth: 2560,
-         minHeight: 1440,
-         width: 2560,
-         height: 1440
+        //  minWidth: 2560,
+        //  minHeight: 1440,
+        //  width: 2560,
+        //  height: 1440
          }
      
      //  if (deviceId == 'ios') {
@@ -107,7 +107,8 @@
         video: video
     };
 
-    
+    window.baseVideo = baseVideo;
+
     navigator.mediaDevices.getUserMedia(constraints).then(stream => {
             console.log(stream);
              stream.getVideoTracks().forEach(track => {
@@ -118,10 +119,15 @@
              
              baseVideo.srcObject = stream;
              baseVideo.addEventListener('loadedmetadata', () => {
+                console.log('play video');
                  baseVideo.play();
                  reserve(true, stream);
              });
-         }).catch('Open camera failed!');
+         }).catch((err) => {
+            // todo retry
+            console.log(err)
+         }
+         )
      })
  }
  

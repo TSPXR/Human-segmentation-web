@@ -1,7 +1,7 @@
 import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
-import * as backgroundPlayer from './backgroundAr.js';
-
+// import * as backgroundPlayer from './backgroundAr.js';
+import * as backgroundVideo from './backgroundVIdeo.js';
 
 /*
     Canvas mask 
@@ -11,116 +11,95 @@ import * as backgroundPlayer from './backgroundAr.js';
     https://github.com/tensorflow/tfjs-models/blob/b5d49c0f5ba2057cc29b40317126c5f182495f96/body-pix/src/output_rendering_util.ts
 */
 
+/*
+    ----------------------<<< Global variable >>>----------------------
+*/
 
-let width = 1280;
-let height = 720;
-
+// VideoElemet의 너비
+let width = 1440;
+// VideoElement의 높이
+let height = 2560;
+// Tensorflow backend 설정 (for GPU)
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
-// tf.setBackend('wsa')
-console.log(tf.getBackend()); // tf backend 확인
 
-
+// Tensorflow segmentation model load
 const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
 
-const canvas = document.getElementById("render_area");
-canvas.width = width; // VideoElement width
-canvas.height = height; // VideoElement height
+/* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
+// 배경 부분은 0으로 처리되어 출력됨
+const renderAreaCanvas = document.getElementById("render_area");
+renderAreaCanvas.width = width; // VideoElement width
+renderAreaCanvas.height = height; // VideoElement height
 
-let context = canvas.getContext('2d');
-context.width = width;
-context.height = height;
-// context.fillStyle = '#ffffff'; // implicit alpha of 1
-// context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+let renderAreaContext = renderAreaCanvas.getContext('2d');
+renderAreaContext.width = width;
+renderAreaContext.height = height;
 
-const buffer = document.getElementById('buffer');
-buffer.width = width;
-buffer.height = height;
-const bufferCtx = buffer.getContext( '2d', { willReadFrequently: true } );
+/* Segmentation model 출력 결과를 그릴 mask*/
+const renderMaskCanvas = document.getElementById("render_mask");
 
-const maskCanvas = document.getElementById("render_mask");
-let maskContext = maskCanvas.getContext('2d');
+/* Background와 Foreground video 변경 시 사용하는 함수*/
 
-// const videoElement = document.querySelector('video');
+backgroundVideo.setVideoIdx(5);
+
+/* VideoElemet */
 const videoElement = document.getElementById('video');
-// camera_util.getCamera(videoElement);
-console.log(videoElement)
-
-
 videoElement.addEventListener('canplaythrough', render_video);
-// console.log(videoElement.videoWidth, videoElement.videoHeight);
-// videoElement.width = width;
-// videoElement.height = height;
-
-
-
 
 
 async function render_video(){
     tf.engine().startScope()
-    
     let date1 = new Date();
     
+    /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
-    
-    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
+    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [256, 256]);
     const normalizedImage = tf.div(resizedImage, 255);
-    
-    // const output = await model.executeAsync(resizedImage);
+
     const output = await model.execute(normalizedImage).expandDims(3);
-
-    // console.log(output);
-    
     const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
-    // const resizedOutput = tf.image.resizeBilinear(output, [720, 1280]).squeeze(0).cast('float32');
 
-    tf.browser.toPixels(resizedOutput, maskCanvas);
-    
-    
-    context.clearRect(0, 0, width, height);
-    context.filter = "url(#lumToAlpha)";
-    context.drawImage( maskCanvas, 0, 0, width, height );
-    context.filter = "none";
-    context.globalCompositeOperation = 'source-in';
-    context.drawImage( videoElement, 0, 0, width, height);
-    context.globalCompositeOperation = 'source-over';
-    
+    /* 합성하는 부분 */
+    tf.browser.toPixels(resizedOutput, renderMaskCanvas);
 
+    // renderAreaContext.clearRect(0, 0, width, height);
+    // renderAreaContext.filter = "url(#lumToAlpha)";
+    // renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
+    // renderAreaContext.filter = "none";
+    // renderAreaContext.globalCompositeOperation = 'source-in';
+    // renderAreaContext.drawImage( videoElement, 0, 0, width, height);
+    // renderAreaContext.globalCompositeOperation = 'source-over';
     
+    renderAreaContext.clearRect(0, 0, width, height);
 
-    // 첫번째 방법
-    // context.globalCompositeOperation = 'source-over';
-    // context.drawImage(maskCanvas, 0, 0);
-    // context.globalCompositeOperation = 'multiply'; // multiply , source-in
-    // context.drawImage(videoElement, 0 , 0);
-
-    
+    // renderAreaContext.filter = "none";
+    // renderAreaContext.globalCompositeOperation = 'source-in';
+    // renderAreaContext.drawImage(backgroundVideo.backgroundVideo, 0, 0, width, height );
+    // renderAreaContext.globalCompositeOperation = 'source-over';
     
 
-    // let invertMask = tf.where(resizedOutput>0, 0, 1);
-    // console.log(invertMask)
-     
+    renderAreaContext.filter = "url(#lumToAlpha)";
+    renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
+    renderAreaContext.filter = "none";
+    renderAreaContext.globalCompositeOperation = 'source-in';
+    renderAreaContext.drawImage( videoElement, 0, 0, width, height);
+    renderAreaContext.globalCompositeOperation = 'source-over';
+
+    
+    
     tf.dispose(inputImageTensor);
     tf.dispose(resizedImage);
+    tf.dispose(normalizedImage);
     tf.dispose(output);
+    tf.dispose(resizedOutput);
 
     var date2 = new Date();
     var diff = date2 - date1;
     console.log(diff);
-    
- 
+
     tf.engine().endScope()
     await requestAnimationFrame(render_video);
-    
-    
 }
 
 window.onload = camera_util.getCamera(videoElement);
-
-// 페이지를 로드하면 실행 (구성요소들 초기화)
-window.onload = () => {
-    console.log('on load')
-    // canvas.width = width;
-    // canvas.height = height;
-    camera_util.getCamera(videoElement);
-}
