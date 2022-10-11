@@ -19,35 +19,38 @@ import * as backgroundVideo from './backgroundVIdeo.js';
 let width = 1440;
 // VideoElement의 높이
 let height = 2560;
-
+// Tensorflow backend 설정 (for GPU)
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
-// tf.setBackend('wsa')
-console.log(tf.getBackend()); // tf backend 확인
 
-
+// Tensorflow segmentation model load
 const model = await tf.loadGraphModel('assets/segmentation_model_bak/model.json');
 
 /* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
-const canvas = document.getElementById("render_area");
-canvas.width = width; // VideoElement width
-canvas.height = height; // VideoElement height
+const renderAreaCanvas = document.getElementById("render_area");
+renderAreaCanvas.width = width; // VideoElement width
+renderAreaCanvas.height = height; // VideoElement height
 
-let context = canvas.getContext('2d');
-context.width = width;
-context.height = height;
+let renderAreaContext = renderAreaCanvas.getContext('2d');
+renderAreaContext.width = width;
+renderAreaContext.height = height;
 
 /* Segmentation model 출력 결과를 그릴 mask*/
-const maskCanvas = document.getElementById("render_mask");
+const renderMaskCanvas = document.getElementById("render_mask");
+
+/* Background와 Foreground video 변경 시 사용하는 함수*/
+// backgroundVideo.setVideoIdx(2);
 
 /* VideoElemet */
 const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
-
 async function render_video(){
     tf.engine().startScope()
-    let date1 = new Date();
+    // let date1 = new Date();
+    // var date2 = new Date();
+    // var diff = date2 - date1;
+    // console.log(diff);
 
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
@@ -58,14 +61,14 @@ async function render_video(){
     const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
 
     /* 합성하는 부분 */
-    tf.browser.toPixels(resizedOutput, maskCanvas);
-    context.clearRect(0, 0, width, height);
-    context.filter = "url(#lumToAlpha)";
-    context.drawImage( maskCanvas, 0, 0, width, height );
-    context.filter = "none";
-    context.globalCompositeOperation = 'source-in';
-    context.drawImage( videoElement, 0, 0, width, height);
-    context.globalCompositeOperation = 'source-over';
+    tf.browser.toPixels(resizedOutput, renderMaskCanvas);
+    renderAreaContext.clearRect(0, 0, width, height);
+    renderAreaContext.filter = "url(#lumToAlpha)";
+    renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
+    renderAreaContext.filter = "none";
+    renderAreaContext.globalCompositeOperation = 'source-in';
+    renderAreaContext.drawImage( videoElement, 0, 0, width, height);
+    renderAreaContext.globalCompositeOperation = 'source-over';
     
     tf.dispose(inputImageTensor);
     tf.dispose(resizedImage);
@@ -73,18 +76,8 @@ async function render_video(){
     tf.dispose(output);
     tf.dispose(resizedOutput);
 
-    var date2 = new Date();
-    var diff = date2 - date1;
-    console.log(diff);
-    
     tf.engine().endScope()
     await requestAnimationFrame(render_video);
 }
 
 window.onload = camera_util.getCamera(videoElement);
-
-// 페이지를 로드하면 실행 (구성요소들 초기화)
-// window.onload = () => {
-//     console.log('on load')
-//     camera_util.getCamera(videoElement);
-// }
