@@ -149,7 +149,7 @@ html, body {
 	object-fit: cover;	
 }
 
-#render_front {
+/* #render_front {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -159,29 +159,3 @@ html, body {
 	height: 100% !important;
 	object-fit: cover;	
 }
-
-
-/* 
-#render_background {
-	position: absolute;
-	left: 0;
-	top: 0;
-	z-index: 104;
-	display: block;
-	width: 100% !important;
-	height: 100% !important;
-	object-fit: cover;
-	visibility: hidden;
-}
-
-#render_mask {
-	position: absolute;
-	left: 0;
-	top: 0;
-	z-index: 96;
-	display: block;
-	width: 100% !important;
-	height: 100% !important;
-	object-fit: cover;
-	visibility: hidden;
-} */

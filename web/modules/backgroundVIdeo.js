@@ -10,7 +10,7 @@ backgroundVideo.autoplay = true;
 backgroundVideo.loop = true;
 backgroundVideo.mute = true;
 backgroundVideo.setAttribute('crossorigin', 'annonymous');
-backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_back.webm'; 
+backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
 
 
 
@@ -23,12 +23,20 @@ frontVideo.autoplay = true;
 frontVideo.loop = true;
 frontVideo.mute = true;
 frontVideo.setAttribute('crossorigin', 'annonymous');
+frontVideo.filter = 
 frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm';
 
 
 function setVideoIdx(idx){
     globalIdx = idx;
-    backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_back.webm'; 
+    backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
+
+    if (idx <= 3 ){
+       frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm'; 
+    }
+    else{
+        frontVideo.src = undefined;
+    }
 }
 
-export{setVideoIdx}
+export{setVideoIdx, backgroundVideo, frontVideo}
