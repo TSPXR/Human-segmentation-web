@@ -90,10 +90,10 @@
           width: 1440,
           height: 2560,
  
-        //  minWidth: 2560,
-        //  minHeight: 1440,
-        //  width: 2560,
-        //  height: 1440
+        //  minWidth: 720,
+        //  minHeight: 1280,
+        //  width: 720,
+        //  height: 1280
          }
      
      //  if (deviceId == 'ios') {
@@ -153,7 +153,7 @@
         //  else if (isIOS) {
         //      cameraId = 'ios';
         //  }
-        cameraId = cameraList[0];
+        cameraId = cameraList[1];
         console.log(baseVideo);
          openCamera(baseVideo, cameraId).then((camAct, stream) => {
              if (camAct) {

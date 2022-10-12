@@ -1,6 +1,6 @@
 import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
-// import * as backgroundPlayer from './backgroundAr.js';
+import * as backgroundPlayer from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
 import * as captureFunc from './capture.js'
 
@@ -25,7 +25,8 @@ tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
 
 // Tensorflow segmentation model load
-const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
+// const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
+const model = await tf.loadGraphModel('assets/light_segmentation_model/model.json');
 
 /* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
 // 배경 부분은 0으로 처리되어 출력됨
@@ -42,43 +43,31 @@ const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
 
-backgroundVideo.setVideoIdx(5);
+
 
 /* VideoElemet */
 const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
-
+backgroundVideo.setVideoIdx(4);
 async function render_video(){
     tf.engine().startScope()
     let date1 = new Date();
     
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
-    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [256, 256]);
+    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
     const normalizedImage = tf.div(resizedImage, 255);
 
     const output = await model.execute(normalizedImage).expandDims(3);
-    const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
+    // const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
+    const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0);
 
     /* 합성하는 부분 */
     tf.browser.toPixels(resizedOutput, renderMaskCanvas);
+    tf.engine().endScope()
 
-    // renderAreaContext.clearRect(0, 0, width, height);
-    // renderAreaContext.filter = "url(#lumToAlpha)";
-    // renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
-    // renderAreaContext.filter = "none";
-    // renderAreaContext.globalCompositeOperation = 'source-in';
-    // renderAreaContext.drawImage( videoElement, 0, 0, width, height);
-    // renderAreaContext.globalCompositeOperation = 'source-over';
-    
     renderAreaContext.clearRect(0, 0, width, height);
-
-    // renderAreaContext.filter = "none";
-    // renderAreaContext.globalCompositeOperation = 'source-in';
-    // renderAreaContext.drawImage(backgroundVideo.backgroundVideo, 0, 0, width, height );
-    // renderAreaContext.globalCompositeOperation = 'source-over';
-    
 
     renderAreaContext.filter = "url(#lumToAlpha)";
     renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
@@ -87,19 +76,11 @@ async function render_video(){
     renderAreaContext.drawImage( videoElement, 0, 0, width, height);
     renderAreaContext.globalCompositeOperation = 'source-over';
 
-    
-    
-    tf.dispose(inputImageTensor);
-    tf.dispose(resizedImage);
-    tf.dispose(normalizedImage);
-    tf.dispose(output);
-    tf.dispose(resizedOutput);
-
     var date2 = new Date();
     var diff = date2 - date1;
     console.log(diff);
 
-    tf.engine().endScope()
+
     await requestAnimationFrame(render_video);
 }
 
