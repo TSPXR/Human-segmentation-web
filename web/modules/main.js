@@ -2,6 +2,7 @@ import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
 // import * as backgroundPlayer from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
+import * as captureFunc from './capture.js'
 
 /*
     Canvas mask 
@@ -102,4 +103,11 @@ async function render_video(){
     await requestAnimationFrame(render_video);
 }
 
-window.onload = camera_util.getCamera(videoElement);
+window.onload = () => {
+    camera_util.getCamera(videoElement);
+
+    const controller = document.querySelector('.controller');
+    const renderAR = document.querySelector('#render_ar');
+    const layer = [ renderAR ];
+    captureFunc.createCaptureButton(videoElement, controller, layer, sx, sy, dx, dy);
+} 
