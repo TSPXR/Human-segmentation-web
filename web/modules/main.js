@@ -1,6 +1,6 @@
 import * as camera_util from "./camera.js";
 // import {flipCanvasHorizontal} from "./drawMask.js";
-// import * as backgroundPlayer from './backgroundAr.js';
+import * as backgroundPlayer from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
 
 /*
@@ -41,13 +41,18 @@ renderAreaContext.height = height;
 const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
+
+
+
 /* VideoElemet */
 const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
-backgroundVideo.setVideoIdx(1);
+backgroundVideo.setVideoIdx(4);
 async function render_video(){
     tf.engine().startScope()
+    let date1 = new Date();
+    
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
     const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
@@ -69,6 +74,12 @@ async function render_video(){
     renderAreaContext.globalCompositeOperation = 'source-in';
     renderAreaContext.drawImage( videoElement, 0, 0, width, height);
     renderAreaContext.globalCompositeOperation = 'source-over';
+
+    var date2 = new Date();
+    var diff = date2 - date1;
+    console.log(diff);
+
+
     await requestAnimationFrame(render_video);
 }
 

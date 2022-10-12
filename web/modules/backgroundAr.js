@@ -37,33 +37,20 @@ renderer.setSize(camera_width, camera_height);
 
 window.addEventListener('resize', onWindowResize, false);
 
-// Background video path
-const backgroundVideoPath = 'assets/background_videos/';
-const backgroundVideo = document.getElementById('backgroundVideo');
-backgroundVideo.width = camera_width;
-backgroundVideo.height = camera_height;
-backgroundVideo.autoplay = true;
-backgroundVideo.loop = true;
-backgroundVideo.mute = true;
-backgroundVideo.setAttribute('crossorigin', 'annonymous');
-backgroundVideo.src = backgroundVideoPath + 'seungeun_bg.webm';
-
 
 // Front video setting
-const frontVideoPath = 'assets/front_videos/'
-const frontVideo = document.getElementById('frontVideo');
-frontVideo.width = camera_width;
-frontVideo.height = camera_height;
-frontVideo.autoplay = true;
-frontVideo.loop = true;
-frontVideo.mute = true;
-frontVideo.setAttribute('crossorigin', 'annonymous');
-frontVideo.src = frontVideoPath + 'front.webm';
+const ojbectArPath = 'assets/object_videos/'
+let objectVideo = document.getElementById('objectVideo');
+objectVideo.autoplay = true;
+objectVideo.loop = true;
+objectVideo.mute = true;
+objectVideo.setAttribute('crossorigin', 'annonymous');
+objectVideo.src = ojbectArPath + '03_headfollow.webm';
 // backgroundVideo.addEventListener('canplaythrough', render_ar_video);
 
 let videoGeometry = new THREE.PlaneBufferGeometry(1.7, 1);
 
-let videoTexture = new THREE.VideoTexture(video);
+let videoTexture = new THREE.VideoTexture(objectVideo);
 videoTexture.minFilter = THREE.LinearFilter;
 videoTexture.format = THREE.RGBFormat;
 
@@ -77,11 +64,11 @@ backgroundVideo.onplay = function() {
 }
 
 
-// let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
 
 // Set Three.js Perspective camera and Renderer
 
-// scene.add(videoMesh);
+scene.add(videoMesh);
 
 
 function onWindowResize() {
@@ -95,14 +82,17 @@ function onWindowResize() {
 
 async function render_ar_video() {
     console.log('render')
-    camera.updateProjectionMatrix();
+    // camera.updateProjectionMatrix();
   camera.position.z = 0.5;
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.rotation.y = 0.5;
+  videoMesh.rotation.x = 0.1;
+  videoMesh.rotation.y = 0.1;
+  // renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.render(scene, camera);
   
-    renderer.render(scene, camera);
+    // renderer.render(scene, camera);
     await requestAnimationFrame(render_ar_video);
     // setTimeout(render_ar_video, 1)
 }
 
-// render_ar_video()
+render_ar_video()
