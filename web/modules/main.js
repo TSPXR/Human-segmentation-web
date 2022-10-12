@@ -1,6 +1,5 @@
 import * as camera_util from "./camera.js";
-// import {flipCanvasHorizontal} from "./drawMask.js";
-import * as backgroundPlayer from './backgroundAr.js';
+import {updateRotationAndPosition} from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
 import * as captureFunc from './capture.js'
 
@@ -42,7 +41,43 @@ renderAreaContext.height = height;
 const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
+const sendCanvas = document.createElement('canvas');
+sendCanvas.width = 360;
+sendCanvas.height= 640;
+let sendCanvasContext = sendCanvas.getContext('2d');
 
+const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
+
+webSocket.interval = setInterval(() => { // ?초마다 클라이언트로 메시지 전송
+    if (webSocket.readyState === webSocket.OPEN) {
+        
+        sendCanvasContext.drawImage(renderAreaCanvas, 0, 0, 1440, 2560, 0, 0, 360, 640);
+        let sendData = sendCanvas.toDataURL('image/jpeg', 0.5)
+        webSocket.send(sendData.split(",")[1]);
+        
+    }
+}, 50);
+
+webSocket.onmessage = function(message){  
+    let recvData = message.data.split(',');
+
+    let idx = 6
+    
+    let center_x = parseInt(recvData[idx-6]);
+    let center_y = parseInt(recvData[idx-5]);
+    let scale = parseFloat(recvData[idx-4]);
+    let x_rot = parseFloat(recvData[idx-3]);
+    let y_rot = parseFloat(recvData[idx-2]);
+    let z_rot = parseFloat(recvData[idx-1]);
+    
+    updateRotationAndPosition(0,
+                                center_x,
+                                center_y,
+                                scale,
+                                x_rot,
+                                y_rot,
+                                z_rot);
+}
 
 
 /* VideoElemet */
@@ -50,10 +85,10 @@ const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
 backgroundVideo.setVideoIdx(4);
+
 async function render_video(){
     tf.engine().startScope()
-    let date1 = new Date();
-    
+
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
     const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
@@ -75,12 +110,6 @@ async function render_video(){
     renderAreaContext.globalCompositeOperation = 'source-in';
     renderAreaContext.drawImage( videoElement, 0, 0, width, height);
     renderAreaContext.globalCompositeOperation = 'source-over';
-
-    var date2 = new Date();
-    var diff = date2 - date1;
-    console.log(diff);
-
-
     await requestAnimationFrame(render_video);
 }
 

@@ -21,7 +21,6 @@ frontVideo.autoplay = true;
 frontVideo.loop = true;
 frontVideo.mute = true;
 frontVideo.setAttribute('crossorigin', 'annonymous');
-
 frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm';
 
 

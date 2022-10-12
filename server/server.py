@@ -43,9 +43,9 @@ class TCPServer():
         self.prev_x = np.reshape(np.zeros(self.maximum_samples), (self.maximum_samples, 1))
         self.prev_y = np.reshape(np.zeros(self.maximum_samples), (self.maximum_samples, 1))
         self.prev_scales = np.zeros((self.maximum_samples, 1))
-        self.sx = 480 #480
-        self.sy = 120
-        self.image_shape = (960, 1280) # H,W
+        self.sx = 0 #480
+        self.sy = 0
+        self.image_shape = (640, 360) # H,W
         
         self.load_model()
     
@@ -53,7 +53,7 @@ class TCPServer():
         # Face detection tflite converted model
         self.fd = service.UltraLightFaceDetecion("weights/RFB-320.tflite",
                                                  conf_threshold=0.8, nms_iou_threshold=0.5,
-                                                 nms_max_output_size=200)
+                                                 nms_max_output_size=100)
         # Facial landmark detection tflite converted model
         self.fa = service.DepthFacialLandmarks("weights/sparse_face.tflite")
 
@@ -95,9 +95,9 @@ class TCPServer():
 
         # Post processing
         for results in self.fa.get_landmarks(feed, boxes):
-            pose(frame, results, (100, 50, 150))
-            sparse(frame, results, (128, 255, 30))
-            dense(frame, results, (0, 60, 200))
+            # pose(frame, results, (100, 50, 150))
+            # sparse(frame, results, (128, 255, 30))
+            # dense(frame, results, (0, 60, 200))
             # mesh(frame, results, self.color)
             # Get 3x3 rotation matrix
             _, params = results
@@ -172,8 +172,8 @@ class TCPServer():
 
                 """Restore the x,y coordinates according to the size of 
                    the frame received through the Websocket"""
-                cx = (((x_min + (width / 2)) / self.image_shape[1]) * 1600 ) + self.sx
-                cy = (((y_min + (height / 2)) / self.image_shape[0]) *  1200 ) + self.sy
+                cx = (((x_min + (width / 2)) / self.image_shape[1]) * 1440 ) + self.sx
+                cy = (((y_min + (height / 2)) / self.image_shape[0]) *  2560 ) + self.sy
                 
                 
                 """ Clipping by comparing the difference with the previous result """
@@ -191,6 +191,7 @@ class TCPServer():
                 if abs(self.prev_scales[idx, 0] - norm_scale) > 0.025:
                     self.prev_scales[idx, 0] = norm_scale
                 
+                print(angle_filtered[idx])
                 """ Convert detection results (center x, y, angles, scale) to string """
                 center_x = str(round(self.prev_x[idx, 0])) + ','
                 center_y = str(round(self.prev_y[idx, 0])) + ','
@@ -211,8 +212,8 @@ class TCPServer():
         # cv2.putText(frame,  str(number_samples), (425, 70), cv2.FONT_HERSHEY_SIMPLEX, 1.2,
         #                 (5, 50, 255), 3, cv2.LINE_AA)
 
-        cv2.imshow('window', frame)
-        cv2.waitKey(1)
+        # cv2.imshow('window', frame)
+        # cv2.waitKey(1)
         return output
         
     async def loop_logic(self, websocket: websockets, path):
@@ -234,7 +235,8 @@ class TCPServer():
             self.ssl_context = None
         else:
             self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-            self.ssl_context.load_cert_chain(certfile=self.cert_dir, keyfile=self.key_dir, password=self.password)
+            # self.ssl_context.load_cert_chain(certfile=self.cert_dir, keyfile=self.key_dir, password=self.password)
+            self.ssl_context.load_cert_chain(certfile=self.cert_dir, keyfile=self.key_dir)
         self.start_server = websockets.serve(self.loop_logic,
                                             port=self.port, ssl=self.ssl_context,
                                             max_size=402144,
