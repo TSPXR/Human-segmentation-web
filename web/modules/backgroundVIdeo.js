@@ -12,8 +12,6 @@ backgroundVideo.mute = true;
 backgroundVideo.setAttribute('crossorigin', 'annonymous');
 backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
 
-
-
 // Front video setting
 const frontVideoPath = 'assets/front_videos/'
 const frontVideo = document.getElementById('frontVideo');
@@ -23,7 +21,7 @@ frontVideo.autoplay = true;
 frontVideo.loop = true;
 frontVideo.mute = true;
 frontVideo.setAttribute('crossorigin', 'annonymous');
-frontVideo.filter = 
+
 frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm';
 
 
