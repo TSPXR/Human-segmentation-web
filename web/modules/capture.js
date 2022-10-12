@@ -20,22 +20,8 @@ let qrLayer = null;
 let wss = null;
 let previousImage = null;
 
-function random() {
-    const seed = parseInt(Math.random() * 10);
-
-    console.log(seed);
-    
-    // if (seed % 2 == 0) {
-    //     return 'coffee';
-    // }
-    // else {
-    //     return 'normal';
-    // }
-    return 'coffee';
-}
-
-function connectCaptureServer(videoElement, layerList, cx, cy, cw, ch, effect) {
-    wss = new WebSocket('wss://ar.tsp-xr.com:5503');
+function connectCaptureServer(layerList, width, height, effect) {
+    wss = new WebSocket('wss://127.0.0.1:5503');
     // const wss = new WebSocket('wss://192.168.0.43:5503');
 
     wss.onmessage = (msg) => {
@@ -43,24 +29,24 @@ function connectCaptureServer(videoElement, layerList, cx, cy, cw, ch, effect) {
 
         switch(jsonData.flag){
             case flag.GET_IMAGE_FLAG:
-                let eventResult = 'coffee';
     
                 effect.countDown().then(() => {
                     effect.playEffect().then(() => {
-                        const capturedImage = getCaptureImage(videoElement, layerList, cx, cy, cw, ch);
-    
-                        getFrame([ capturedImage ], eventResult).then((imgBase64) => {
-                            previousImage = imgBase64;
-                            wss.send(JSON.stringify({
-                                'flag' : flag.SEND_IMAGE_FLAG,
-                                'data' : imgBase64
-                            }));
-                        });
+                        getCaptureImage(layerList, width, height).then((imgBase64) => {
+                            if (imgBase64) {
+                                previousImage = imgBase64;
+                                wss.send(JSON.stringify({
+                                    'flag': flag.SEND_IMAGE_FLAG,
+                                    'data': imgBase64
+                                }));
+                            }
+                        })
                     })
                 });
                 break;
-            case flag.CHANGE_MODEL_FLAG:
-                window.changeModel();
+            case flag.CHANGE_FRAME_FLAG:
+                const idx = String(jsonData.data);
+                window.changeFrame(idx);
                 break;
         }
     };
@@ -101,16 +87,6 @@ function getCurrentDate() {
     return dateString;
 }
 
-function getFrameInfo() {
-    const request = new XMLHttpRequest();
-    request.open('GET', frameConfigPath);
-    request.responseType = 'json';
-    request.send();
-    request.onload = () => {
-        frameConfig = request.response;
-    }
-}
-
 function downloadImage(imageURL, imageName=null) {
     let dataURL = imageURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
     dataURL = dataURL.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Capture.png');
@@ -127,130 +103,91 @@ function downloadImage(imageURL, imageName=null) {
     link.click();
 }
 
-function getCaptureImage(videoElement, layerList, cx=0, cy=0, cw=0, ch=0) {
-    // const width = videoElement.videoWidth;
-    // const height = videoElement.videoHeight;
-    const width = 2560;
-    const height = 1440;
+function getCaptureImage(layerList, width, height) {
+    return new Promise( (resolve) => {
+        captureCanvas.width = width;
+        captureCanvas.height = height;
 
-    if (cw === 0 || ch === 0) {
-        cw = width;
-        ch = height;
-    }
+        try {
+            layerList.forEach( (layer, idx) => {
+                captureContext.drawImage(layer, 0, 0, width, height);
+                if (idx == 1) {
+                    captureContext.filter = 'none';
+                }
+            });
 
-    captureCanvas.width = width;
-    captureCanvas.height = height;
+            const imgBase64 = captureCanvas.toDataURL('image/png', 1.0);
 
-    try {
-        captureContext.drawImage(videoElement, 0, 0, width, height);
+            downloadImage(imgBase64);
 
-        layerList.forEach((layer) => {
-            const tmpCanvas = document.createElement('canvas');
-            const tmpContext = tmpCanvas.getContext('2d');
-
-            tmpCanvas.width = layer.width;
-            tmpCanvas.height = layer.height;
-
-            tmpContext.translate(width, 0); 
-            tmpContext.scale(-1, 1);
-            tmpContext.drawImage(layer, 0, 0, layer.width, layer.height);
-
-            captureContext.drawImage(tmpCanvas, 0, 0, layer.width, layer.height);
-        });
-    
-        const imgData = captureContext.getImageData(cx, cy, cw, ch);
-
-        captureCanvas.width = cw;
-        captureCanvas.height = ch;
-        captureContext.putImageData(imgData, 0, 0);
-        const imgBase64 = captureCanvas.toDataURL('image/png', 1.0);
-
-        downloadImage(imgBase64);
-    
-        return {
-            'data': imgData,
-            'imgURL': imgBase64,
-        };
-    } catch (err) {
-        console.error(err);
-        return;
-    }
+            resolve(imgBase64)
+        } catch (err) {
+            console.error(err);
+            resolve(null);
+        }
+    })
 }
 
-function createCaptureButton(videoElement,
-                                                            containerElement,
-                                                            layerList,
-                                                            cx=0, cy=0, cw=0, ch=0,
-                                                            buttonElement=null) {
+function createCaptureButton(containerElement, layerList, width, height) {
     if (!captureButton) {
-        if (buttonElement) {
-            captureButton = buttonElement;
-            container = containerElement;
-        } else {
-            container = containerElement;
-            const buttonContainer = document.createElement('div');
+        container = containerElement;
+        const buttonContainer = document.createElement('div');
 
-            captureButton = document.createElement('div');
-            captureButton.id = 'capture-btn';
-            captureButton.style.position = 'absolute';
-            captureButton.style.backgroundColor = '#FF0000';
-            captureButton.style.width = '25px';
-            captureButton.style.height = '25px';
-            captureButton.style.borderRadius = '25px';
-            captureButton.style.margin = '10px';
-            captureButton.style.bottom = 0;
-            captureButton.style.right = 0;
-            captureButton.style.zIndex = '1000';
+        captureButton = document.createElement('div');
+        captureButton.id = 'capture-btn';
+        captureButton.style.position = 'absolute';
+        captureButton.style.backgroundColor = '#FF0000';
+        captureButton.style.width = '25px';
+        captureButton.style.height = '25px';
+        captureButton.style.borderRadius = '25px';
+        captureButton.style.margin = '10px';
+        captureButton.style.bottom = 0;
+        captureButton.style.right = 0;
+        captureButton.style.zIndex = '1000';
 
-            sendButton = document.createElement('div');
-            sendButton.id = 'send-btn';
-            sendButton.style.position = 'absolute';
-            sendButton.style.backgroundColor = '#2222FF';
-            sendButton.style.width = '25px';
-            sendButton.style.height = '25px';
-            sendButton.style.borderRadius = '25px';
-            sendButton.style.margin = '10px';
-            sendButton.style.bottom = 0;
-            sendButton.style.right = '30px';
-            sendButton.style.zIndex = '1000';
+        sendButton = document.createElement('div');
+        sendButton.id = 'send-btn';
+        sendButton.style.position = 'absolute';
+        sendButton.style.backgroundColor = '#2222FF';
+        sendButton.style.width = '25px';
+        sendButton.style.height = '25px';
+        sendButton.style.borderRadius = '25px';
+        sendButton.style.margin = '10px';
+        sendButton.style.bottom = 0;
+        sendButton.style.right = '30px';
+        sendButton.style.zIndex = '1000';
 
-            qrButton = document.createElement('img');
-            qrButton.src = './assets/img/qr/connect.png';
-            qrButton.style.position = 'absolute';
-            qrButton.style.width = '25px';
-            qrButton.style.height = '25px';
-            qrButton.style.margin = '10px';
-            qrButton.style.bottom = 0;
-            qrButton.style.right = '60px';
-            qrButton.style.zIndex = '1000';
+        qrButton = document.createElement('img');
+        qrButton.src = './assets/img/qr/connect.png';
+        qrButton.style.position = 'absolute';
+        qrButton.style.width = '25px';
+        qrButton.style.height = '25px';
+        qrButton.style.margin = '10px';
+        qrButton.style.bottom = 0;
+        qrButton.style.right = '60px';
+        qrButton.style.zIndex = '1000';
 
-            buttonContainer.appendChild(captureButton);
-            buttonContainer.appendChild(sendButton);
-            buttonContainer.appendChild(qrButton);
-            container.prepend(buttonContainer);
-        }
+        buttonContainer.appendChild(captureButton);
+        buttonContainer.appendChild(sendButton);
+        buttonContainer.appendChild(qrButton);
+        container.prepend(buttonContainer);
     }
 
     const effect = createCaptureEffect(containerElement);
-    connectCaptureServer(videoElement, layerList, cx, cy, cw, ch, effect);
-    getFrameInfo();
+    connectCaptureServer(layerList, width, height, effect);
 
     captureButton.addEventListener('click', (event) => {
         effect.playEffect().then(() => {
-            let eventResult = 'normal';
-            const capturedImage = getCaptureImage(videoElement, layerList, cx, cy, cw, ch);
-                        
-            eventResult = random();
-
-            getFrame([ capturedImage ], eventResult).then((imgBase64) => {
-                previousImage = imgBase64;
-                wss.send(JSON.stringify({
-                    'flag' : flag.SEND_IMAGE_FLAG,
-                    'data' : imgBase64
-                }));
+            getCaptureImage(layerList, width, height).then( (imgBase64) => {
+                if (imgBase64) {
+                    previousImage = imgBase64;
+                    wss.send(JSON.stringify({
+                        'flag': flag.SEND_IMAGE_FLAG,
+                        'data': imgBase64
+                    }));
+                }
             });
         })
-        //downloadImage(capturedImage.imgURL);
     });
 
     sendButton.addEventListener('click', (event) => {
@@ -260,16 +197,16 @@ function createCaptureButton(videoElement,
     });
 
     qrButton.addEventListener('click', () => {
-        showQRLayer()
+        showQRLayer();
     });
+
+    container.addEventListener('click', () => {
+        showQRLayer();
+    })
 }
 
 function showQRLayer() {
     if (!qrLayer) {
-        const width = document.body.clientWidth;
-        const height = document.body.clientHeight;
-        const scale = 0.4;
-
         qrLayer = document.createElement('div');
         qrLayer.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
         qrLayer.style.position = 'absolute';
@@ -282,26 +219,32 @@ function showQRLayer() {
         qrLayer.style.zIndex = '1000';
 
         const qrContainer = document.createElement('div');
+        qrContainer.style.position = 'absolute';
+        qrContainer.style.display = 'flex';
+        qrContainer.style.flexDirection = 'row';
+        qrContainer.style.justifyContent = 'center';
+        qrContainer.style.alignItems = 'center';
+        qrContainer.style.paddingBottom = '80px'
 
         const wifi = document.createElement('img');
         wifi.src = './assets/img/qr/wifi.png';
-        wifi.style.width = `400px`;
-        wifi.style.height = `400px`;
+        wifi.style.width = `40%`;
 
         const connect = document.createElement('img');
         connect.src = './assets/img/qr/connect.png';
-        connect.style.width = `400px`;
-        connect.style.height = `400px`;
-        connect.style.paddingLeft = "50px";
+        connect.style.width = `40%`;
+        connect.style.paddingLeft = '20px';
 
         const help = document.createElement('div');
-        help.style.width = '850px';
+        help.style.position = 'absolute';
+        help.style.width = '85%';
         help.style.color = '#FFF';
         help.style.textAlign = 'center';
-        help.style.paddingTop = '50px';
         help.style.fontSize = '20px';
         help.style.fontFamily = 'NanumSquare';
-        help.innerHTML = '좌측 QR을 통해 WiFi 먼저 접속하신 후 오른쪽 QR로 접속해주세요';
+        help.style.paddingTop = '200px'
+
+        help.innerHTML = '좌측 QR을 통해 WiFi 먼저 접속하신 후<br>우측 QR로 접속해주세요';
 
         qrContainer.appendChild(wifi);
         qrContainer.appendChild(connect);
@@ -484,60 +427,6 @@ function createCaptureEffect(containerElement) {
         init();
         return { 'playEffect': playEffect, 'countDown': countDown };
     }
-}
-
-function getFrame(imgList, eventResult) {
-    let mode = `${frameType}_${eventResult}_frame`;
-
-    return new Promise((resolve, reject) => {
-        const imageCanvas = document.createElement('canvas');
-        const imageContext = imageCanvas.getContext('2d');
-    
-        const tmpCanvas = document.createElement('canvas');
-        const tmpContext = tmpCanvas.getContext('2d');
-    
-        const frameCanvas = document.createElement('canvas');
-        const frameContext = frameCanvas.getContext('2d');
-    
-        const config = frameConfig.frameImg;
-        const frameSrc = config[mode].imgSrc;
-        const frameWidth = config[mode].imgWidth;
-        const frameHeight = config[mode].imgHeight;
-        const frameImg = new Image();
-    
-        frameImg.onload = () => {
-            frameCanvas.width = frameWidth;
-            frameCanvas.height = frameHeight;
-    
-            Object.keys(config[mode].idx).forEach((id) => {
-                const ox = config[mode].idx[id].offsetX;
-                const oy = config[mode].idx[id].offsetY;
-                const img = imgList[0].data;
-    
-                const rw = frameWidth - (ox * 2);
-                const rh = rw * (img.height / img.width);
-    
-                tmpCanvas.width = img.width;
-                tmpCanvas.height = img.height;
-                tmpContext.putImageData(img, 0, 0);
-    
-                imageCanvas.width = rw;
-                imageCanvas.height = rh;
-                imageContext.drawImage(tmpCanvas, 0, 0, img.width, img.height, 0, 0, rw, rh);
-                const imgData = imageContext.getImageData(0, 0, rw, rh);
-    
-                createImageBitmap(imgData).then((imgBitmap) => {
-                    frameContext.drawImage(imgBitmap, ox, oy, rw, rh);
-                    frameContext.drawImage(frameImg, 0, 0, frameWidth, frameHeight);
-                    const imgBase64 = frameCanvas.toDataURL('image/png', 1.0);
-                    // downloadImage(imgBase64);
-                    resolve(imgBase64);
-                })
-            });
-        }
-    
-        frameImg.src = frameSrc;
-    });
 }
 
 export { getCaptureImage, downloadImage, createCaptureButton }

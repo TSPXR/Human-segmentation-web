@@ -43,7 +43,7 @@ function setPreviewLayer(imgBase64) {
 }
 
 function connectServer() {
-    const wss = new WebSocket('wss://ar.tsp-xr.com:5503');
+    const wss = new WebSocket('wss://127.0.0.1:5503');
 
     wss.onmessage = (msg) => {
         const jsonData = JSON.parse(msg.data);
@@ -77,17 +77,12 @@ function connectServer() {
                 'flag' : flag.GET_IMAGE_FLAG
             }));
         },
-        changeFrameMsg: (frameType) => {
+        changeFrameMsg: (frameNum) => {
             wss.send(JSON.stringify({
                 'flag' : flag.CHANGE_FRAME_FLAG,
-                'data': frameType
+                'data': frameNum
             }));
         },
-        changeModelMsg: () => {
-            wss.send(JSON.stringify({
-                'flag' : flag.CHANGE_MODEL_FLAG,
-            }));
-        }
     } 
 }
 
@@ -96,6 +91,12 @@ window.onload = () => {
     clickFunc = () => {
         captureBtn.style.backgroundColor = '#FF3333';
         server.sendCaptureMsg();
+
+        server.changeFrameMsg(2)
+
+        // setTimeout(() => {
+        //     captureBtn.style.backgroundColor = '#CCC';
+        // }, 1000);
 
         const guide = document.querySelector('.guide');
         const inner = guide.querySelector('p');

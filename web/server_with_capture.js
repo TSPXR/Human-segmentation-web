@@ -27,16 +27,15 @@ const server_port = 5503;
 const server = require('https').createServer(options, app);
 
 app.get('/', (req, res) => {
-  
     res.render(__dirname + "/mainPage.html");    // index.ejs을 사용자에게 전달
 })
 
 app.get('/capture', (req, res) => {
-  res.render(__dirname + '/capture.html');
-  })
+    res.render(__dirname + '/capture.html');
+})
 
 server.listen(server_port, function() {
-  console.log( 'Express server listening on port ' + server.address().port );
+    console.log( 'Express server listening on port ' + server.address().port );
 });
 
 const wss = new WebSocket.Server({ server })
@@ -45,9 +44,7 @@ const GET_IMAGE_FLAG = '$$GETIMG';
 const CAMERA_SERVER_FLAG = '$$CAM_SERVER';
 const CLIENT_FLAG = '$$CLIENT';
 const SEND_IMAGE_FLAG = '$$SENDIMG';
-const COFFEE_NUM_FLAG = '$$COFFEE';
 const CHANGE_FRAME_FLAG = '$$FRAME';
-const CHANGE_MODEL_FLAG = '$$CHANGE_MODEL';
 
 const clients = new Map();
 let camServer = null;
@@ -76,13 +73,8 @@ wss.on('connection', (ws, req) => {
                 break;
             case CHANGE_FRAME_FLAG:
                 camServer.ws.send(JSON.stringify({
-                    'flag' : CHANGE_FRAME_FLAG
-                }));
-                break;
-            case CHANGE_MODEL_FLAG:
-                camServer.ws.send(JSON.stringify({
-                    'flag' : CHANGE_MODEL_FLAG,
-                    'data' : jsonData.data
+                    'flag' : CHANGE_FRAME_FLAG,
+                    'data': jsonData.data
                 }));
                 break;
             case SEND_IMAGE_FLAG:
