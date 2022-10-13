@@ -1,5 +1,5 @@
 import * as camera_util from "./camera.js";
-import {updateRotationAndPosition} from './backgroundAr.js';
+// import {updateRotationAndPosition} from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
 
 /*
@@ -24,7 +24,7 @@ tf.setBackend('webgl');
 
 // Tensorflow segmentation model load
 // const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
-const model = await tf.loadGraphModel('assets/light_segmentation_model/model.json');
+const model = await tf.loadGraphModel('assets/coex_segmentation_model/model.json');
 
 /* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
 // 배경 부분은 0으로 처리되어 출력됨
@@ -40,43 +40,42 @@ renderAreaContext.height = height;
 const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
-const sendCanvas = document.createElement('canvas');
-sendCanvas.width = 360;
-sendCanvas.height= 640;
-let sendCanvasContext = sendCanvas.getContext('2d');
+// const sendCanvas = document.createElement('canvas');
+// sendCanvas.width = 360;
+// sendCanvas.height= 640;
+// let sendCanvasContext = sendCanvas.getContext('2d');
 
-const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
-
-webSocket.interval = setInterval(() => { // ?초마다 클라이언트로 메시지 전송
-    if (webSocket.readyState === webSocket.OPEN) {
+// const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
+// webSocket.interval = setInterval(() => { // ?초마다 클라이언트로 메시지 전송
+//     if (webSocket.readyState === webSocket.OPEN) {
         
-        sendCanvasContext.drawImage(renderAreaCanvas, 0, 0, 1440, 2560, 0, 0, 360, 640);
-        let sendData = sendCanvas.toDataURL('image/jpeg', 0.5)
-        webSocket.send(sendData.split(",")[1]);
+//         sendCanvasContext.drawImage(renderAreaCanvas, 0, 0, 1440, 2560, 0, 0, 360, 640);
+//         let sendData = sendCanvas.toDataURL('image/jpeg', 0.5)
+//         webSocket.send(sendData.split(",")[1]);
         
-    }
-}, 50);
+//     }
+// }, 50);
 
-webSocket.onmessage = function(message){  
-    let recvData = message.data.split(',');
+// webSocket.onmessage = function(message){  
+//     let recvData = message.data.split(',');
 
-    let idx = 6
+//     let idx = 6
     
-    let center_x = parseInt(recvData[idx-6]);
-    let center_y = parseInt(recvData[idx-5]);
-    let scale = parseFloat(recvData[idx-4]);
-    let x_rot = parseFloat(recvData[idx-3]);
-    let y_rot = parseFloat(recvData[idx-2]);
-    let z_rot = parseFloat(recvData[idx-1]);
+//     let center_x = parseInt(recvData[idx-6]);
+//     let center_y = parseInt(recvData[idx-5]);
+//     let scale = parseFloat(recvData[idx-4]);
+//     let x_rot = parseFloat(recvData[idx-3]);
+//     let y_rot = parseFloat(recvData[idx-2]);
+//     let z_rot = parseFloat(recvData[idx-1]);
     
-    updateRotationAndPosition(0,
-                                center_x,
-                                center_y,
-                                scale,
-                                x_rot,
-                                y_rot,
-                                z_rot);
-}
+//     updateRotationAndPosition(0,
+//                                 center_x,
+//                                 center_y,
+//                                 scale,
+//                                 x_rot,
+//                                 y_rot,
+//                                 z_rot);
+// }
 
 
 /* VideoElemet */
