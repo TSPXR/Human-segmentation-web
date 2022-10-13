@@ -1,5 +1,5 @@
 import * as camera_util from "./camera.js";
-import {updateRotationAndPosition} from './backgroundAr.js';
+// import {updateRotationAndPosition} from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
 import * as captureFunc from './capture.js'
 
@@ -25,7 +25,7 @@ tf.setBackend('webgl');
 
 // Tensorflow segmentation model load
 // const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
-const model = await tf.loadGraphModel('assets/light_segmentation_model/model.json');
+const model = await tf.loadGraphModel('assets/coex_segmentation_model/model.json');
 
 /* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
 // 배경 부분은 0으로 처리되어 출력됨
@@ -41,10 +41,10 @@ renderAreaContext.height = height;
 const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
-const sendCanvas = document.createElement('canvas');
-sendCanvas.width = 360;
-sendCanvas.height= 640;
-let sendCanvasContext = sendCanvas.getContext('2d');
+// const sendCanvas = document.createElement('canvas');
+// sendCanvas.width = 360;
+// sendCanvas.height= 640;
+// let sendCanvasContext = sendCanvas.getContext('2d');
 
 // const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
 

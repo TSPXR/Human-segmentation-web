@@ -5,9 +5,9 @@ const WebSocket = require('ws');
 const fs = require('fs');
 
 const options = {
-    key: fs.readFileSync('../../ssl/privkey.pem', 'utf8'),
-    cert: fs.readFileSync('../../ssl/cert.pem', 'utf8'),
-    passphrase: 'tsp190910',
+    key: fs.readFileSync('./ssl/park-tdl.tspxr.ml-key.pem'),
+    cert: fs.readFileSync('./ssl/park-tdl.tspxr.ml-crt.pem'),
+    // passphrase: 'tsp190910',
     requestCert: false,
     rejectUnauthorized: false
 };
@@ -22,8 +22,8 @@ app.use('/modules', express.static(__dirname + '/modules'));
 app.use('/build', express.static('/home/park/park/Human-segmentation-web/node_modules/three/build'));
 app.use('/gltf', express.static('/home/park/park/Human-segmentation-web/node_modules/three/'));
 
-// const server_port = 5555;
-const server_port = 5503;
+const server_port = 5555;
+// const server_port = 5503;
 const server = require('https').createServer(options, app);
 
 app.get('/', (req, res) => {
