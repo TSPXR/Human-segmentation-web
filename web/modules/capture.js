@@ -21,7 +21,7 @@ let wss = null;
 let previousImage = null;
 
 function connectCaptureServer(layerList, width, height, effect) {
-    wss = new WebSocket('wss://127.0.0.1:5503');
+    wss = new WebSocket('wss://park-tdl.tspxr.ml:5555');
     // const wss = new WebSocket('wss://192.168.0.43:5503');
 
     wss.onmessage = (msg) => {
