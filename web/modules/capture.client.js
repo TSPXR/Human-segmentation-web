@@ -86,13 +86,31 @@ function connectServer() {
     } 
 }
 
+function changeSlide(element) {
+    const slides = document.querySelectorAll(".slide");
+
+    slides.forEach((slide) => {
+        slide.classList.remove("selected");
+    });
+
+    element.classList.add("selected");
+}
+
 window.onload = () => {
     const server = connectServer();
+    const slides = document.querySelectorAll('.slide');
+
+    slides.forEach((slide) => {
+        slide.addEventListener('click', () => {
+            console.log("test")
+            changeSlide(slide);
+            server.changeFrameMsg(slide.id);
+        })
+    })
+
     clickFunc = () => {
         captureBtn.style.backgroundColor = '#FF3333';
         server.sendCaptureMsg();
-
-        server.changeFrameMsg(2)
 
         // setTimeout(() => {
         //     captureBtn.style.backgroundColor = '#CCC';
