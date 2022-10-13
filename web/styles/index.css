@@ -92,7 +92,7 @@ html, body {
 	/* visibility: hidden; */
 	/* transform: rotate(90deg); */
 	/* -webkit-transform: scaleX(-1); */
-	/* transform: scaleX(-1); */
+	transform: scaleX(-1);
 }
 
 
@@ -138,7 +138,7 @@ html, body {
 	
 	/* object-fit: cover; */
 	/* -webkit-transform: scaleX(-1); */
-	/* transform: scaleX(-1); */
+	transform: scaleX(-1);
 }
 
 
@@ -151,6 +151,7 @@ html, body {
 	width: 100% !important;
 	height: 100% !important;
 	object-fit: cover;
+	transform: scaleX(-1);
 } 
 #render_ar {
 	position: absolute;
@@ -161,6 +162,7 @@ html, body {
 	width: 100% !important;
 	height: 100% !important;
 	object-fit: cover;
+	transform: scaleX(-1);
 } 
 
 #rotate_canvas {
