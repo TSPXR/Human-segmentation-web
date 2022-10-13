@@ -29,7 +29,7 @@ function setVideoIdx(idx){
     backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
 
     if (idx <= 3 ){
-       frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm'; 
+        frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm'; 
     }
     else{
         frontVideo.src = undefined;

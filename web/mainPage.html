@@ -15,9 +15,9 @@
     <!--
     <script type="importmap">
         {
-          "imports": {
-            "three": "./modules/three.js/three.module.js"
-          }
+            "imports": {
+                "three": "./modules/three.js/three.module.js"
+            }
         }
     </script>
     -->
@@ -47,11 +47,13 @@
         <!-- <canvas id="render_front" width="1440" height="2560" hidden></canvas> -->
 
         <svg width=0 height=0 style=visibility:hidden;position:absolute>
-          <filter id=lumToAlpha>
-            <feColorMatrix type="luminanceToAlpha" />
-          </filter>
+            <filter id=lumToAlpha>
+                <feColorMatrix type="luminanceToAlpha" />
+            </filter>
         </svg>
         
+        <div class="controller"></div>
+
     </div>
 
 </body>

@@ -1,6 +1,7 @@
 import * as camera_util from "./camera.js";
 // import {updateRotationAndPosition} from './backgroundAr.js';
 import * as backgroundVideo from './backgroundVIdeo.js';
+import * as captureFunc from './capture.js'
 
 /*
     Canvas mask 
@@ -40,12 +41,22 @@ renderAreaContext.height = height;
 const renderMaskCanvas = document.getElementById("render_mask");
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
+<<<<<<< HEAD
 // const sendCanvas = document.createElement('canvas');
 // sendCanvas.width = 360;
 // sendCanvas.height= 640;
 // let sendCanvasContext = sendCanvas.getContext('2d');
 
 // const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
+=======
+const sendCanvas = document.createElement('canvas');
+sendCanvas.width = 360;
+sendCanvas.height= 640;
+let sendCanvasContext = sendCanvas.getContext('2d');
+
+// const webSocket = new WebSocket('wss://park-tdl.tspxr.ml:7777');
+
+>>>>>>> web_test
 // webSocket.interval = setInterval(() => { // ?초마다 클라이언트로 메시지 전송
 //     if (webSocket.readyState === webSocket.OPEN) {
         
@@ -111,4 +122,13 @@ async function render_video(){
     await requestAnimationFrame(render_video);
 }
 
-window.onload = camera_util.getCamera(videoElement);
+window.onload = () => {
+    camera_util.getCamera(videoElement);
+
+    window.changeFrame = backgroundVideo.setVideoIdx;
+
+    const renderAR = document.querySelector('#render_ar');
+    const controller = document.querySelector('.controller');
+    const layer = [backgroundVideo.backgroundVideo, renderAreaCanvas, renderAR, backgroundVideo.frontVideo ];
+    captureFunc.createCaptureButton(controller, layer, width, height);
+} 
