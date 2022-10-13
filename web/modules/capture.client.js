@@ -4,6 +4,8 @@ import { downloadImage } from './capture.js'
 const guideContainer = document.querySelector('.guide-container');
 const captureBtn = document.querySelector('#capture-btn');
 const downloadIcon = document.querySelector('#download-icon');
+const previewSlide = document.querySelector('#preview-slider');
+
 let preview = null;
 let previewImg = null;
 let clickFunc = null;
@@ -15,7 +17,7 @@ function setPreviewLayer(imgBase64) {
         preview.style.position = 'abosolute';
         preview.style.width = '100%';
         preview.style.height = '100%';
-        preview.style.backgroundColor = '#ccc';
+        // preview.style.backgroundColor = '#ccc';
         preview.style.display = 'none';
         preview.style.justifyContent = 'center';
         preview.style.alignItems = 'center';
@@ -31,6 +33,7 @@ function setPreviewLayer(imgBase64) {
             clickFunc = () => {
                 downloadImage(imgBase64);
             }
+            previewSlide.style.display = 'none';
             captureBtn.style.backgroundColor = '#CCC';
             preview.style.display = 'flex';
             downloadIcon.style.display = 'block';
@@ -43,7 +46,7 @@ function setPreviewLayer(imgBase64) {
 }
 
 function connectServer() {
-    const wss = new WebSocket('wss://127.0.0.1:5503');
+    const wss = new WebSocket('wss://park-tdl.tspxr.ml:5555');
 
     wss.onmessage = (msg) => {
         const jsonData = JSON.parse(msg.data);

@@ -118,7 +118,7 @@ function getCaptureImage(layerList, width, height) {
 
             const imgBase64 = captureCanvas.toDataURL('image/png', 1.0);
 
-            downloadImage(imgBase64);
+            // downloadImage(imgBase64);
 
             resolve(imgBase64)
         } catch (err) {
@@ -240,9 +240,9 @@ function showQRLayer() {
         help.style.width = '85%';
         help.style.color = '#FFF';
         help.style.textAlign = 'center';
-        help.style.fontSize = '20px';
+        help.style.fontSize = '3em';
         help.style.fontFamily = 'NanumSquare';
-        help.style.paddingTop = '200px'
+        help.style.paddingTop = '800px'
 
         help.innerHTML = '좌측 QR을 통해 WiFi 먼저 접속하신 후<br>우측 QR로 접속해주세요';
 
@@ -352,7 +352,7 @@ function createCaptureEffect(containerElement) {
         const playEffect = () => {
             return new Promise((resolve) => {
                 const width = captureEffectCanvas.width;
-                const step = 160;
+                const step = 100;
                 let current = width;
     
                 radius = width;

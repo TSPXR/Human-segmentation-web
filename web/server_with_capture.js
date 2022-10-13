@@ -5,8 +5,8 @@ const WebSocket = require('ws');
 const fs = require('fs');
 
 const options = {
-    key: fs.readFileSync('./ssl/park-tdl.tspxr.ml-key.pem'),
-    cert: fs.readFileSync('./ssl/park-tdl.tspxr.ml-crt.pem'),
+    key: fs.readFileSync('../ssl/park-tdl.tspxr.ml-key.pem'),
+    cert: fs.readFileSync('../ssl/park-tdl.tspxr.ml-crt.pem'),
     // passphrase: 'tsp190910',
     requestCert: false,
     rejectUnauthorized: false
