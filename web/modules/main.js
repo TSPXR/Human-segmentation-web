@@ -19,6 +19,11 @@ import * as captureFunc from './capture.js'
 let width = 1440;
 // VideoElement의 높이
 let height = 2560;
+
+// Segmentation model input width
+let model_width = 360;
+let model_height = 640;
+
 // Tensorflow backend 설정 (for GPU)
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
@@ -39,6 +44,8 @@ renderAreaContext.height = height;
 
 /* Segmentation model 출력 결과를 그릴 mask*/
 const renderMaskCanvas = document.getElementById("render_mask");
+renderMaskCanvas.width = model_width; // VideoElement width
+renderMaskCanvas.height = model_height; // VideoElement height
 
 /* Background와 Foreground video 변경 시 사용하는 함수*/
 // const sendCanvas = document.createElement('canvas');
@@ -84,41 +91,45 @@ const renderMaskCanvas = document.getElementById("render_mask");
 const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
-backgroundVideo.setVideoIdx(2);
+backgroundVideo.setVideoIdx(3);
 async function render_video(){
-    tf.engine().startScope()
-
+    tf.engine().startScope();
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
-    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [640, 360]);
+    const resizedImage = tf.image.resizeBilinear(inputImageTensor, [model_height, model_width]);
     const normalizedImage = tf.div(resizedImage, 255);
 
-    const output = await model.execute(normalizedImage).expandDims(3);
+    // const output = await model.execute(normalizedImage).expandDims(3).squeeze(0).mul(255).cast('int32');
+    const output = await model.execute(normalizedImage).expandDims(3).squeeze(0).cast('float32');
     // const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0).mul(255).cast('int32');
-    const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0);
+    // const resizedOutput = tf.image.resizeBilinear(output, [width, height]).squeeze(0);
 
     /* 합성하는 부분 */
-    tf.browser.toPixels(resizedOutput, renderMaskCanvas);
-    tf.engine().endScope()
+    tf.browser.toPixels(output, renderMaskCanvas);
+    tf.engine().endScope();
 
     renderAreaContext.clearRect(0, 0, width, height);
-
     renderAreaContext.filter = "url(#lumToAlpha)";
-    renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
+    // renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );
+    renderAreaContext.drawImage(renderMaskCanvas, 0, 0, model_width, model_height, 0, 0, width, height );
     renderAreaContext.filter = "none";
     renderAreaContext.globalCompositeOperation = 'source-in';
-    renderAreaContext.drawImage( videoElement, 0, 0, width, height);
+    renderAreaContext.drawImage(videoElement, 0, 0, width, height);
     renderAreaContext.globalCompositeOperation = 'source-over';
     await requestAnimationFrame(render_video);
 }
 
-window.onload = () => {
-    console.log('on load')
-    camera_util.getCamera(videoElement);
-    window.changeFrame = backgroundVideo.setVideoIdx;
 
-    const renderAR = document.querySelector('#render_ar');
-    const controller = document.querySelector('.controller');
-    const layer = [backgroundVideo.backgroundVideo, renderAreaCanvas, renderAR, backgroundVideo.frontVideo ];
-    captureFunc.createCaptureButton(controller, layer, width, height);
+
+console.log('on load')
+camera_util.getCamera(videoElement);
+window.changeFrame = backgroundVideo.setVideoIdx;
+
+const renderAR = document.querySelector('#render_ar');
+const controller = document.querySelector('.controller');
+const layer = [backgroundVideo.backgroundVideo, renderAreaCanvas, renderAR, backgroundVideo.frontVideo ];
+captureFunc.createCaptureButton(controller, layer, width, height);
+
+window.onload = () => {
+
 } 

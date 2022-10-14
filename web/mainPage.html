@@ -26,6 +26,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
 
     <script type="module" src="./modules/main.js"></script>
+    
 </head>
 
 <body>
@@ -34,9 +35,10 @@
         <span class="loading-text">Test segmentation</span>
         <!-- <video id="video" width="2560" height="1440"></video> -->
         
-        <video id="video" muted playsinline autoplay></video>
-        <video id="objectVideo" style="display: none;" muted playsinline autoplay width="1440" height="2560"></video>
+        <video id="video" muted playsinline autoplay hidden display:none></video>
+        <!-- <video id="objectVideo" style="display: none;" muted playsinline autoplay width="1440" height="2560"></video> -->
         <video id="backgroundVideo" muted playsinline autoplay width="1440" height="2560"></video>
+        
         <video id="frontVideo" muted playsinline autoplay width="1440" height="2560"></video>
         
         

@@ -1,6 +1,7 @@
 const camera_width = 1440;
 const camera_height = 2560;
 let globalIdx = 1;
+
 // Background video path
 const backgroundVideoPath = 'assets/background_videos/';
 const backgroundVideo = document.getElementById('backgroundVideo');
@@ -10,7 +11,7 @@ backgroundVideo.autoplay = true;
 backgroundVideo.loop = true;
 backgroundVideo.mute = true;
 backgroundVideo.setAttribute('crossorigin', 'annonymous');
-backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
+backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'
 
 // Front video setting
 const frontVideoPath = 'assets/front_videos/'
@@ -21,12 +22,14 @@ frontVideo.autoplay = true;
 frontVideo.loop = true;
 frontVideo.mute = true;
 frontVideo.setAttribute('crossorigin', 'annonymous');
-frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm';
-
+// frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm';
 
 function setVideoIdx(idx){
+    console.log('test');
     globalIdx = idx;
+    
     backgroundVideo.src = backgroundVideoPath + String(globalIdx) + '_BG.webm'; 
+
 
     if (idx <= 3 ){
         frontVideo.src = frontVideoPath + String(globalIdx) + '_front.webm'; 
@@ -36,5 +39,5 @@ function setVideoIdx(idx){
     }
 }
 
-console.log('test');
+
 export{setVideoIdx, backgroundVideo, frontVideo}
