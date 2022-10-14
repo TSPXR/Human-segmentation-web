@@ -36,4 +36,5 @@ function setVideoIdx(idx){
     }
 }
 
+console.log('test');
 export{setVideoIdx, backgroundVideo, frontVideo}

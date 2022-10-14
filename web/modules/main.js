@@ -85,7 +85,6 @@ const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
 backgroundVideo.setVideoIdx(2);
-
 async function render_video(){
     tf.engine().startScope()
 
@@ -114,8 +113,8 @@ async function render_video(){
 }
 
 window.onload = () => {
+    console.log('on load')
     camera_util.getCamera(videoElement);
-
     window.changeFrame = backgroundVideo.setVideoIdx;
 
     const renderAR = document.querySelector('#render_ar');
