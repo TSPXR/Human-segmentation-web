@@ -84,7 +84,7 @@ const renderMaskCanvas = document.getElementById("render_mask");
 const videoElement = document.getElementById('video');
 videoElement.addEventListener('canplaythrough', render_video);
 
-backgroundVideo.setVideoIdx(4);
+backgroundVideo.setVideoIdx(2);
 
 async function render_video(){
     tf.engine().startScope()
