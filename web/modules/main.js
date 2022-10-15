@@ -42,6 +42,8 @@ renderAreaCanvas.height = height; // VideoElement height
 let renderAreaContext = renderAreaCanvas.getContext('2d');
 renderAreaContext.width = width;
 renderAreaContext.height = height;
+// renderAreaContext.translate(1440, 0);
+// renderAreaContext.scale(-1,1);
 
 /* Segmentation model 출력 결과를 그릴 mask*/
 const renderMaskCanvas = document.getElementById("render_mask");
@@ -110,6 +112,7 @@ async function render_video(){
     tf.browser.toPixels(output, renderMaskCanvas);
     tf.engine().endScope();
 
+    
     renderAreaContext.clearRect(0, 0, width, height);
     renderAreaContext.filter = "url(#lumToAlpha)";
     // renderAreaContext.drawImage( renderMaskCanvas, 0, 0, width, height );

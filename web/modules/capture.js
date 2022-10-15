@@ -243,7 +243,7 @@ function showQRLayer() {
         help.style.textAlign = 'center';
         help.style.fontSize = '3em';
         help.style.fontFamily = 'NanumSquare';
-        help.style.paddingTop = '800px'
+        help.style.paddingTop = '900px'
 
         help.innerHTML = '좌측 QR을 통해 WiFi 먼저 접속하신 후<br>우측 QR로 접속해주세요';
 
