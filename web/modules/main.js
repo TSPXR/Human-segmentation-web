@@ -26,6 +26,7 @@ let model_height = 640;
 
 // Tensorflow backend 설정 (for GPU)
 tf.ENV.set("WEBGL_CPU_FORWARD", true)
+// tf.setBackend('webgpu');
 tf.setBackend('webgl');
 
 // Tensorflow segmentation model load
@@ -94,6 +95,7 @@ videoElement.addEventListener('canplaythrough', render_video);
 backgroundVideo.setVideoIdx(3);
 async function render_video(){
     tf.engine().startScope();
+
     /* tensorflow segmentation 연산 부분*/
     const inputImageTensor = tf.expandDims(tf.cast(tf.browser.fromPixels(videoElement), 'float32'), 0);
     const resizedImage = tf.image.resizeBilinear(inputImageTensor, [model_height, model_width]);
