@@ -38,7 +38,7 @@ html, body {
     width: 100%;
     height: 100%;
     margin: 0 auto;
-    background-color: #222;
+    background-color: #FFF;
     overflow: hidden;
     -webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -55,7 +55,7 @@ html, body {
 
 .guide-container {
     position: absolute;
-    background-color: #222;
+    background-color: #FFF;
     display: flex;
     width: 100%;
     height: 65%;
@@ -75,73 +75,97 @@ html, body {
 }
 
 .guide-container p {
-    color: #FFF;
+    color: #333;
     margin: 0 auto;
     font-size: 12px;
-    font-family: 'NanumGothic';
-    padding-top: 10px;
+    font-family: 'NanumSquare';
+    padding-top: 15px;
 }
 
-.btn-container {
+.category-container {
+    background-color: #EEE;
     position: absolute;
-    width: 100%;
-    height: 35%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    bottom: 0;
-}
-
-#capture-btn-outline {
-    position: absolute;
-    width: 5em;
-    height: 5em;
-    background-color: #CCC;
-    border: 0.2em solid #CCC;
-    border-radius: 50%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-}
-
-#capture-btn {
-    width: 92%;
-    height: 92%;
-    background-color: #CCC;
-    border: 0.25em solid #222;
-    border-radius: 50%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#capture-btn #download-icon {
-    position: absolute;
-    width: 30%;
-    display: none;
-}
-
-#preview-slider {
-    position: absolute;
-    width: 100%;
-    height: 80px;
-    bottom: 180px;
-}
-
-.slider {
-    width: 100%;
+    height: 1.6em;
+    bottom: 12em;
     text-align: center;
     overflow: hidden;
     position: absolute;
+    border-radius: 2em;
+    padding: 2.5px;
     display: flex;
     justify-content: center;
 }
 
-.slides {
+#category-container .categories::-webkit-scrollbar {
     display: none;
+}
+
+.categories {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.category-selected {
+    background-color: #FFF;
+}
+
+.category {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 3.5em;
+    height: 100%;
+    margin-right: 5px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    border-radius: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.last-category {
+    margin-right: 0px;
+}
+
+.category p {
+    margin: 0 auto;
+    font-size: 0.9em;
+    font-family: "NanumSquare";
+    color: #333;
+}
+
+.category img {
+    margin: 0 auto;
+    width: 95%;
+}
+
+.slider {
+    position: absolute;
+    width: 100%;
+    height: 80px;
+    bottom: 6.7em;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+#slider .slides::-webkit-scrollbar {
+    display: none;
+}
+
+.slides {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -160,10 +184,11 @@ html, body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: #2e2e2e;
-    border-radius: 50px;
-    border: 2px solid #464646;
+    background-color: #333;
+    border: none;
+    border-radius: 50%;
     display: flex;
+    margin: 0 auto;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -181,12 +206,14 @@ html, body {
     margin: 0 auto;
     font-size: 20px;
     font-family: "NanumSquare";
-    color: #d4d4d4;
+    color: #FFF;
 }
 
 .slide img {
+    position: absolute;
     margin: 0 auto;
-    width: 95%;
+    width: 48px;
+    height: 48px;
 }
 
 .slide .unit {
@@ -194,7 +221,7 @@ html, body {
 }
 
 .slide.selected {
-    border: 3px solid #CCC;
+    border: 3px solid #DDD;
 }
 
 .slide:focus {
@@ -205,14 +232,43 @@ html, body {
     outline: 1px solid #CCC;
 }
 
-#preview-slider {
-    z-index: 5;
-}
-
-#preview-slider .slides {
+.btn-container {
+    position: absolute;
+    width: 100%;
+    height: 35%;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
 }
 
-#preview-slider .slides::-webkit-scrollbar {
+#capture-btn-outline {
+    position: absolute;
+    width: 4.5em;
+    height: 4.5em;
+    background-color: #333;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 2em;
+    z-index: 1;
+}
+
+#capture-btn {
+    width: 87%;
+    height: 87%;
+    background-color: #FFF;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#capture-btn #download-icon {
+    position: absolute;
+    width: 30%;
     display: none;
 }

@@ -2,8 +2,10 @@ import { flag } from './server.flags.js';
 import { downloadImage } from './capture.js'
 
 const guideContainer = document.querySelector('.guide-container');
+const captureBtnContainer = document.querySelector('.btn-container');
 const captureBtn = document.querySelector('#capture-btn');
 const downloadIcon = document.querySelector('#download-icon');
+const categoryContainer = document.querySelector('.category-container');
 const previewSlide = document.querySelector('#preview-slider');
 
 let preview = null;
@@ -13,10 +15,11 @@ let clickFunc = null;
 
 function setPreviewLayer(imgBase64) {
     if (!preview) {
+        guideContainer.style.height = '80%';
+        captureBtnContainer.style.height = '20%';
+
         preview = document.createElement('div');
         preview.style.position = 'abosolute';
-        preview.style.width = '100%';
-        preview.style.height = '100%';
         // preview.style.backgroundColor = '#ccc';
         preview.style.display = 'none';
         preview.style.justifyContent = 'center';
@@ -27,14 +30,16 @@ function setPreviewLayer(imgBase64) {
         preview.appendChild(previewImg);
         previewImg.style.position = 'absolute';
         //previewImg.style.width = '95%';
-        previewImg.style.height = '95%';
+        previewImg.style.height = `${guideContainer.clientHeight * 0.9}px`;
         
         previewImg.onload = () => {
             clickFunc = () => {
                 downloadImage(imgBase64);
             }
             previewSlide.style.display = 'none';
-            captureBtn.style.backgroundColor = '#CCC';
+            categoryContainer.style.display = 'none';
+            captureBtn.style.backgroundColor = '#FFF';
+            captureBtn.parentElement.style.bottom = `${(captureBtnContainer.clientHeight - captureBtn.parentElement.clientHeight) / 2}px`;
             preview.style.display = 'flex';
             downloadIcon.style.display = 'block';
         };
@@ -90,6 +95,16 @@ function connectServer() {
     } 
 }
 
+function changeCategory(element) {
+    const categories = document.querySelectorAll(".category");
+
+    categories.forEach((category) => {
+        category.classList.remove("category-selected");
+    });
+
+    element.classList.add("category-selected");
+}
+
 function changeSlide(element) {
     const slides = document.querySelectorAll(".slide");
 
@@ -102,11 +117,17 @@ function changeSlide(element) {
 
 window.onload = () => {
     const server = connectServer();
+    const categories = document.querySelectorAll(".category");
     const slides = document.querySelectorAll('.slide');
+
+    categories.forEach((category) => {
+        category.addEventListener('click', () => {
+            changeCategory(category);
+        })
+    })
 
     slides.forEach((slide) => {
         slide.addEventListener('click', () => {
-            console.log("test")
             changeSlide(slide);
             server.changeFrameMsg(slide.id);
         })

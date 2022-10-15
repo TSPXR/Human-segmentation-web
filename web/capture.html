@@ -18,8 +18,8 @@
     <div class="container">
         <div class="guide-container">
             <div class="guide">
-                <img id="logo" src="./assets/logo.png">
-                <p>포즈를 취하신 뒤 아래 촬영버튼을 눌러주세요.</p>
+                <img id="logo" src="./assets/logo_black.png">
+                <p>포즈를 취하신 뒤 아래 촬영버튼을 눌러주세요</p>
             </div>
         </div>
         <div class="btn-container">
@@ -30,16 +30,27 @@
             </div>
         </div>
 
+        <div class="category-container">
+            <div class="categories">
+                <button class="category category-selected" id="1">
+                    <p>테마</p>
+                </button>
+                <button class="category" id="2">
+                    <p>앞</p>
+                </button>
+                <button class="category last-category" id="3">
+                    <p>뒤</p>
+                </button>
+            </div>
+        </div>
+
         <div class="slider" id="preview-slider">
             <div class="slides">
-                <button class="slide selected" id="1">
-                    <p class="num">01</p>
+                <button class="slide" id="1" style="background-image: url('./assets/img/thumb/01.png')">
                 </button>
-                <button class="slide r-slide" id="2">
-                    <p class="num">02</p>
+                <button class="slide r-slide" id="2" style="background-image: url('./assets/img/thumb/02.png')">
                 </button>
-                <button class="slide r-slide" id="3">
-                    <p class="num">03</p>
+                <button class="slide r-slide" id="3" style="background-image: url('./assets/img/thumb/03.png')">
                 </button>
             </div>
         </div>
