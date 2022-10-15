@@ -29,8 +29,8 @@ tf.ENV.set("WEBGL_CPU_FORWARD", true)
 tf.setBackend('webgl');
 
 // Tensorflow segmentation model load
-// const model = await tf.loadGraphModel('assets/segmentation_model/model.json');
-const model = await tf.loadGraphModel('assets/coex_segmentation_model/model.json');
+// const model = await tf.loadGraphModel('assets/coex_segmentation_model/model.json');
+const model = await tf.loadGraphModel('assets/with_raw/model.json');
 
 /* VideoElement에서 Segmentation model이 분할한 이미지를 합성하여 렌더링할 Canvas*/
 // 배경 부분은 0으로 처리되어 출력됨
